@@ -29,7 +29,7 @@
     <div class="container">
         <h1>Current Weather Finder</h1>
         <form id="weatherForm">
-            <input type="text" id="city" name="city" placeholder="Enter City Name">
+            <input type="text" id="postcode" name="postcode" placeholder="Enter Postcode">
             <button type="submit">Get Weather</button>
         </form>
         <div id="weatherResult"></div>
@@ -38,29 +38,27 @@
     <script>
         document.getElementById('weatherForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            const city = document.getElementById('city').value;
+            const postcode = document.getElementById('postcode').value; // Use the postcode input value
         
-            fetch(`/geocode?city=${encodeURIComponent(city)}`)
+            fetch(`/geocode?postcode=${encodeURIComponent(postcode)}`) // Fetch geocode data using postcode
                 .then(response => response.json())
                 .then(geocodeData => {
-                    const { lat, lon } = geocodeData.results[0].geometry; // Adjust according to the actual API response
-                    return fetch(`/weather?lat=${lat}&lon=${lon}`);
+                    const { latitude, longitude } = geocodeData; // Extract latitude and longitude
+                    return fetch(`/weather?lat=${latitude}&lon=${longitude}`); // Fetch weather data using lat & lon
                 })
                 .then(response => response.json())
                 .then(weatherData => {
                     const resultDiv = document.getElementById('weatherResult');
-                    // Display the weather data in a readable format
-                    // Adjust according to the actual API response
                     resultDiv.innerHTML = `<p>Temperature: ${weatherData.main.temp}°C</p>
                                             <p>Weather: ${weatherData.weather[0].main}</p>
-                                            <p>City: ${weatherData.name}</p>`;
+                                            <p>Location: ${weatherData.name}</p>`; // Display weather data
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     document.getElementById('weatherResult').textContent = 'Error fetching weather data';
                 });
         });
-        </script>
-        
+    </script>
 </body>
 </html>
+

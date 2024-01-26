@@ -1,28 +1,31 @@
+import 'dotenv/config';
 import express from 'express';
 import fetch from 'node-fetch';
-import 'dotenv/config';
 
 
 const app = express();
 const PORT = 3000;
 
-// Replace with your actual API keys
 const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
-const GEOCODER_API_KEY = process.env.GEOCODER_API_KEY;
 
 app.use(express.static('public'));
 
-// Route for geocoding
+// Route for geocoding using Postcodes.io
 app.get('/geocode', async (req, res) => {
-    const { city } = req.query;
-    const geocodeUrl = `https://api.geocoder.com/v1/geocode?city=${encodeURIComponent(city)}&apikey=${GEOCODER_API_KEY}`;
+    const { postcode } = req.query; // Receiving postcode from the client
+    const geocodeUrl = `https://api.postcodes.io/postcodes/${encodeURIComponent(postcode)}`;
+    
 
     try {
         const response = await fetch(geocodeUrl);
         const geocodeData = await response.json();
-        // Extract latitude and longitude from geocodeData based on its structure
-        const { latitude, longitude } = geocodeData.results[0].geometry.location; // Modify according to actual API response
-        res.json({ latitude, longitude });
+        if (geocodeData.status === 200 && geocodeData.result) {
+            // Directly accessing latitude and longitude from the geocodeData result
+            const { latitude, longitude } = geocodeData.result;
+            res.json({ latitude, longitude });
+        } else {
+            throw new Error('Invalid postcode or data not found');
+        }
     } catch (error) {
         console.error('Error in geocoding:', error);
         res.status(500).send('Error in geocoding');
@@ -31,9 +34,10 @@ app.get('/geocode', async (req, res) => {
 
 // Route for fetching weather data
 app.get('/weather', async (req, res) => {
-    const { lat, lon } = req.query;
+    const { lat, lon } = req.query; // Receiving latitude and longitude from the client
     const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${WEATHER_API_KEY}&units=metric`;
-
+    
+console.log(weatherUrl)
     try {
         const response = await fetch(weatherUrl);
         const weatherData = await response.json();
@@ -47,3 +51,6 @@ app.get('/weather', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });
+
+console.log("this is it", process.env)
+
