@@ -2,26 +2,63 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API Mashup</title>
-    <link rel="stylesheet" href="/styles.css"
+    <title>Outdoor Activity Planner</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+        }
+        .container {
+            text-align: center;
+        }
+        input, button {
+            margin: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+    </style>
 </head>
 <body>
-    
-    <section id="intro">
-        <h1>Hi, welcome to our App!</h1>
-    </section>
+    <div class="container">
+        <h1>Current Weather Finder</h1>
+        <form id="weatherForm">
+            <input type="text" id="postcode" name="postcode" placeholder="Enter Postcode">
+            <button type="submit">Get Weather</button>
+        </form>
+        <div id="weatherResult"></div>
+    </div>
 
-    <form>
-        <!-- User input -->
-    </form>
-
-    <section id="chatGPTresponse">
-        <h2>ChatGPT's response</h2>
-        <div id="response">
-            <!-- dynamic content from chatGPT reply goes here -->
-        </div>
-    </section>
-    <script src="/client.js"></script>
+    <script>
+        document.getElementById('weatherForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const postcode = document.getElementById('postcode').value; // Use the postcode input value
+        
+            fetch(`/geocode?postcode=${encodeURIComponent(postcode)}`) // Fetch geocode data using postcode
+                .then(response => response.json())
+                .then(geocodeData => {
+                    const { latitude, longitude } = geocodeData; // Extract latitude and longitude
+                    return fetch(`/weather?lat=${latitude}&lon=${longitude}`); // Fetch weather data using lat & lon
+                })
+                .then(response => response.json())
+                .then(weatherData => {
+                    const resultDiv = document.getElementById('weatherResult');
+                    resultDiv.innerHTML = `<p>Temperature: ${weatherData.main.temp}°C</p>
+                                            <p>Weather: ${weatherData.weather[0].main}</p>
+                                            <p>Location: ${weatherData.name}</p>`; // Display weather data
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('weatherResult').textContent = 'Error fetching weather data';
+                });
+        });
+    </script>
 </body>
 </html>
+
