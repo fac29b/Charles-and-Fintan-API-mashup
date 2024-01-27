@@ -1,4 +1,4 @@
-require('dotenv').config();
+import 'dotenv/config';
 const OPENAI_KEY = process.env.OPENAI_KEY;
 
 const OpenAI = require('openai');
