@@ -6,7 +6,7 @@ import fetch from 'node-fetch';
 const app = express();
 const PORT = 3000;
 
-const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
+const WEATHER_API_KEY =process.env.WEATHER_API_KEY;
 
 app.use(express.static('public'));
 
