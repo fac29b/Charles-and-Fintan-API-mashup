@@ -5,24 +5,7 @@
     <title>Outdoor Activity Planner</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f5f5f5;
-        }
-        .container {
-            text-align: center;
-        }
-        input, button {
-            margin: 10px;
-            padding: 10px;
-            font-size: 16px;
-        }
+
     </style>
 </head>
 <body>
@@ -34,31 +17,10 @@
         </form>
         <div id="weatherResult"></div>
     </div>
-
-    <script>
-        document.getElementById('weatherForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const postcode = document.getElementById('postcode').value; // Use the postcode input value
-        
-            fetch(`/geocode?postcode=${encodeURIComponent(postcode)}`) // Fetch geocode data using postcode
-                .then(response => response.json())
-                .then(geocodeData => {
-                    const { latitude, longitude } = geocodeData; // Extract latitude and longitude
-                    return fetch(`/weather?lat=${latitude}&lon=${longitude}`); // Fetch weather data using lat & lon
-                })
-                .then(response => response.json())
-                .then(weatherData => {
-                    const resultDiv = document.getElementById('weatherResult');
-                    resultDiv.innerHTML = `<p>Temperature: ${weatherData.main.temp}°C</p>
-                                            <p>Weather: ${weatherData.weather[0].main}</p>
-                                            <p>Location: ${weatherData.name}</p>`; // Display weather data
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('weatherResult').textContent = 'Error fetching weather data';
-                });
-        });
-    </script>
+    <div class="container">
+        <div id="gptReply"></div>
+    </div>
+    <script type="module" src="script.js"></script>
 </body>
 </html>
 

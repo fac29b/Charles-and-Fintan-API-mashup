@@ -1,12 +1,15 @@
 import 'dotenv/config';
 import express from 'express';
 import fetch from 'node-fetch';
+import { OpenAI } from 'openai';
 
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const openai = new OpenAI({ key: OPENAI_API_KEY });
 
 const app = express();
 const PORT = 3000;
 
-const WEATHER_API_KEY =process.env.WEATHER_API_KEY;
+const WEATHER_API_KEY = process.env.WEATHER_API_KEY;
 
 app.use(express.static('public'));
 
@@ -15,7 +18,6 @@ app.get('/geocode', async (req, res) => {
     const { postcode } = req.query; // Receiving postcode from the client
     const geocodeUrl = `https://api.postcodes.io/postcodes/${encodeURIComponent(postcode)}`;
     
-
     try {
         const response = await fetch(geocodeUrl);
         const geocodeData = await response.json();
@@ -48,9 +50,22 @@ console.log(weatherUrl)
     }
 });
 
+// Route for contacting openAI API
+app.get('/chat', async (req, res) => {
+    console.log('this is the initial get req', req.query)
+    const { postcode, weather } = req.query
+    const completion = await openai.chat.completions.create({
+        messages: [
+            { role: "system", content: `You are a helpful travelguide and event organiser. You will provide a brief description of the area based on the UK postcode which is: ${postcode} . suggest a range of activities to the user that can be done in UK postcode: ${postcode} . Base your suggestions on the weather information which is currently: ${weather}` },
+            { role: 'user', content: `${postcode} ${weather}`},
+        ],
+        model: "gpt-3.5-turbo",
+      });    
+      res.json(completion.choices);
+})
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });
 
-console.log("this is it", process.env)
+// console.log("this is it", process.env)
 
