@@ -1,36 +1,34 @@
 import 'dotenv/config';
-const OPENAI_KEY = process.env.OPENAI_KEY;
+import { OpenAI } from 'openai';
 
-const OpenAI = require('openai');
-const openai = new OpenAI({
-    apiKey: OPENAI_KEY,
-  });
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const openai = new OpenAI({ key: OPENAI_API_KEY });
 
-async function main() {
-    const completion = await openai.chat.completions.create({
-      messages: [{ role: "system", content: "You are a helpful assistant." }],
-      model: "gpt-3.5-turbo",
-    });
-  
-    console.log(completion.choices[0]);
-  }
-  
-
-
-  async function chatReq(req, res){
-    try {
-      const message = "Which is the capital of Albania?";
-      const response = await openai.chat.completions.create({
-        messages: [{ role: "user", content: message }],
-        model: "gpt-3.5-turbo",
-        
-        temperature: 0,
-        max_tokens: 1000,
-      });
-      res.status(200).json(response);
-    } catch (err) {
-      res.status(500).json(err.message);
+export async function handleChatRequest(weatherData) {
+    console.log('test');
+    if (!weatherData) {
+        throw new Error('Weather data not available');
     }
-  };
+    try {
 
-main();
+          // Prepare data to send to ChatGPT
+          const chatData = `Temperature: ${weatherData.main.temp}°C, Weather: ${weatherData.weather[0].main}, Location: ${weatherData.name}`;
+
+          // Make a request to the OpenAI API for chat functionality
+          const response = await openai.chat.completions.create({
+              messages: [
+                  { role: 'system', content: 'You are a helpful assistant.' },
+                  { role: 'user', content: chatData },
+              ],
+              model: 'gpt-3.5-turbo',
+              temperature: 0.7,
+              max_tokens: 150,
+          });
+  
+          const generatedText = response.choices[0].text;
+          return generatedText;
+      } catch (error) {
+          console.error('Error handling chat:', error);
+          throw new Error('Error handling chat');
+      }      
+};

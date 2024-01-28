@@ -9,7 +9,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            display: flex;
+            display: grid;
             justify-content: center;
             align-items: center;
             height: 100vh;
@@ -17,6 +17,12 @@
         }
         .container {
             text-align: center;
+            margin: 0 auto;
+            max-width: 80%;
+        }
+
+        #gptReply {
+            text-align: left;
         }
         input, button {
             margin: 10px;
@@ -34,31 +40,11 @@
         </form>
         <div id="weatherResult"></div>
     </div>
-
-    <script>
-        document.getElementById('weatherForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const postcode = document.getElementById('postcode').value; // Use the postcode input value
-        
-            fetch(`/geocode?postcode=${encodeURIComponent(postcode)}`) // Fetch geocode data using postcode
-                .then(response => response.json())
-                .then(geocodeData => {
-                    const { latitude, longitude } = geocodeData; // Extract latitude and longitude
-                    return fetch(`/weather?lat=${latitude}&lon=${longitude}`); // Fetch weather data using lat & lon
-                })
-                .then(response => response.json())
-                .then(weatherData => {
-                    const resultDiv = document.getElementById('weatherResult');
-                    resultDiv.innerHTML = `<p>Temperature: ${weatherData.main.temp}°C</p>
-                                            <p>Weather: ${weatherData.weather[0].main}</p>
-                                            <p>Location: ${weatherData.name}</p>`; // Display weather data
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('weatherResult').textContent = 'Error fetching weather data';
-                });
-        });
-    </script>
+    <div class="container">
+        <div id="gptReply"></div>
+    </div>
+    <!-- <button id="testButton" onclick="testChat()">Click me</button> -->
+    <script type="module" src="script.js"></script>
 </body>
 </html>
 
