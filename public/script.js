@@ -1,5 +1,6 @@
-// Variables to contain info to send to chatGPT
+// Object to contain info to send to chatGPT
 const gptRequestData = {};
+// Variable to pass the Object info as URL parameters
 let queryParams;
 
 document.getElementById('weatherForm').addEventListener('submit', function(e) {
@@ -23,7 +24,8 @@ document.getElementById('weatherForm').addEventListener('submit', function(e) {
                                     <p>Location: ${weatherData.name}</p>
                                     <p>Coords: ${weatherData.coord.lat}</p>
                                     <p>Postcode: ${postcode}</p>`;// Display weather data
-            testChat()
+            // Call function to make fetch request to chatGPT
+            gptRequest()
         })
         .catch(error => {
             console.error('Error:', error);
@@ -31,8 +33,8 @@ document.getElementById('weatherForm').addEventListener('submit', function(e) {
         });
 });
 
-function testChat() {
-
+// Function to make the fetch request to the openAI API
+function gptRequest() {
     fetch(`/chat?${queryParams = new URLSearchParams({
         postcode: gptRequestData.postcode,
         weather: gptRequestData.weather}).toString()}`)
@@ -49,4 +51,4 @@ function testChat() {
       .catch(error => {
         console.error('Error:', error);
       });
-}
+};

@@ -50,6 +50,7 @@ console.log(weatherUrl)
     }
 });
 
+// Route for contacting openAI API
 app.get('/chat', async (req, res) => {
     console.log('this is the initial get req', req.query)
     const { postcode, weather } = req.query
@@ -59,33 +60,9 @@ app.get('/chat', async (req, res) => {
             { role: 'user', content: `${postcode} ${weather}`},
         ],
         model: "gpt-3.5-turbo",
-      });
-    
+      });    
       res.json(completion.choices);
 })
-
-// // Route for sending message to openAI API
-// app.get('/chat', async (req, res) => {
-//     try {
-//     // Make a request to the OpenAI API for chat functionality
-//     const response = await openai.chat.completions.create({
-//         messages: [
-//             { role: 'system', content: 'You are a helpful assistant.' },
-//             { role: 'user', content: 'hello, who are you?'},
-//         ],
-//         model: 'gpt-3.5-turbo',
-//         temperature: 0.7,
-//         max_tokens: 150,
-//     });
-//         const generatedText = response.choices[0].text;
-//         res.json( generatedText);
-//     } catch (error) {
-//         console.error('Error handling chat:', error);
-//         res.status(500).send('Error handling chat');
-//     }    
-// })
-
-
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });

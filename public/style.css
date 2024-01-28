@@ -3,19 +3,25 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    display: flex;
+    display: grid;
     justify-content: center;
     align-items: center;
     height: 100vh;
     background-color: #f5f5f5;
-    display: grid;
-}
-.container {
-    text-align: center;
 }
 input, button {
     margin: 10px;
     padding: 10px;
     font-size: 16px;
 }
-
+.container {
+    text-align: center;
+    margin: 0 auto;
+    max-width: 80%;
+}
+#gptReply {
+    text-align: left;
+}
+#weatherForm {
+    display: grid;
+}
