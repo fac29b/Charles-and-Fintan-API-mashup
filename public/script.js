@@ -3,6 +3,9 @@ const gptRequestData = {};
 // Variable to pass the Object info as URL parameters
 let queryParams;
 
+// Array to store the conversation history
+let conversationHistory = [];
+
 document.getElementById('weatherForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const postcode = document.getElementById('postcode').value; // Use the postcode input value
@@ -34,21 +37,42 @@ document.getElementById('weatherForm').addEventListener('submit', function(e) {
 });
 
 // Function to make the fetch request to the openAI API
-function gptRequest() {
-    fetch(`/chat?${queryParams = new URLSearchParams({
-        postcode: gptRequestData.postcode,
-        weather: gptRequestData.weather}).toString()}`)
-        .then(response => {
-            if (!response.ok) {
-              throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return response.json();
-          })
-          .then(data => {
-            const gptReply = document.getElementById('gptReply')
-            gptReply.innerText = `${data[0].message.content}`
-          })
-      .catch(error => {
-        console.error('Error:', error);
-      });
-};
+function gptRequest(userInput) {
+  // Add user input to conversation history
+  if (userInput) {
+      conversationHistory.push({ role: 'user', content: userInput });
+  }
+
+  fetch('/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: conversationHistory })
+  })
+  .then(response => response.json())
+  .then(data => {
+      const lastResponse = data[data.length - 1]; // Assuming the last message is from GPT
+      conversationHistory.push({ role: 'system', content: lastResponse.content }); // Update history with GPT response
+
+      // Display the latest GPT response
+      const gptReply = document.getElementById('gptReply');
+      gptReply.innerText += `\nGPT: ${lastResponse.content}`; // Append the latest response to the display
+  })
+  .catch(error => {
+      console.error('Error:', error);
+  });
+}
+
+function sendToGPT() {
+  const userInputField = document.getElementById('userInput');
+  const userInput = userInputField.value;
+  if (userInput.trim()) {
+      gptRequest(userInput);
+      userInputField.value = ''; // Clear the input field
+  }
+}
+
+document.getElementById('sendButton').addEventListener('click', sendToGPT);
+
+
+
+
