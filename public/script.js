@@ -16,7 +16,11 @@ document.getElementById('weatherForm').addEventListener('submit', function(e) {
         
         .then(response => response.json())
         .then(weatherData => {
+            // console.log('This is weather data', weatherData);
             gptRequestData.weather = weatherData.weather[0].main;
+            gptRequestData.temperature = weatherData.main.temp;
+            gptRequestData.maxTemp = weatherData.main.temp_max;
+            gptRequestData.name = weatherData.name;
             gptRequestData.postcode = postcode;
             const resultDiv = document.getElementById('weatherResult');
             resultDiv.innerHTML = `<p>Temperature: ${weatherData.main.temp}°C</p>
@@ -37,7 +41,11 @@ document.getElementById('weatherForm').addEventListener('submit', function(e) {
 function gptRequest() {
     fetch(`/chat?${queryParams = new URLSearchParams({
         postcode: gptRequestData.postcode,
-        weather: gptRequestData.weather}).toString()}`)
+        weather: gptRequestData.weather,
+        temperature: gptRequestData.temperature,
+        maxTemp: gptRequestData.maxTemp,
+        name: gptRequestData.name,
+        conversation: gptRequestData.reply,}).toString()}`)
         .then(response => {
             if (!response.ok) {
               throw new Error(`HTTP error! Status: ${response.status}`);
@@ -45,8 +53,10 @@ function gptRequest() {
             return response.json();
           })
           .then(data => {
-            const gptReply = document.getElementById('gptReply')
-            gptReply.innerText = `${data[0].message.content}`
+            gptRequestData.reply += data[0].message.content;
+            const gptReply = document.getElementById('gptReply');
+            console.log('this is gptRequestData', gptRequestData);
+            gptReply.innerText = `${data[0].message.content}`;
           })
       .catch(error => {
         console.error('Error:', error);

@@ -53,11 +53,19 @@ console.log(weatherUrl)
 // Route for contacting openAI API
 app.get('/chat', async (req, res) => {
     console.log('this is the initial get req', req.query)
-    const { postcode, weather } = req.query
+    const { postcode, weather, reply, temperature, maxTemp, name } = req.query
     const completion = await openai.chat.completions.create({
         messages: [
-            { role: "system", content: `You are a helpful travelguide and event organiser. You will provide a brief description of the area based on the UK postcode which is: ${postcode} . suggest a range of activities to the user that can be done in UK postcode: ${postcode} . Base your suggestions on the weather information which is currently: ${weather}` },
-            { role: 'user', content: `${postcode} ${weather}`},
+            { role: "system", 
+                content: `You are a helpful travelguide, event organiser and weather forecaster. You will provide a brief description of the area based on the UK postcode which is: ${postcode} . 
+                /n suggest a range of activities to the user that can be done in UK postcode: ${postcode} .
+                /n Provide a valid web link to any venue you suggest which must lead to a working website.
+                /n Base your suggestions on the weather information which is currently: ${weather}
+                /n provide directions to other locations listed ${reply}`
+                 
+        },
+            { role: 'user', content: `${postcode} ${weather} ${reply}`
+        },
         ],
         model: "gpt-3.5-turbo",
       });    
