@@ -2,6 +2,10 @@
 const gptRequestData = {};
 // Variable to pass the Object info as URL parameters
 let queryParams;
+// Array to store conversation
+const gptConversation = [];
+// Variable to push user input & gpt replies to 
+const gptAnswer = document.getElementById('gptAnswer');
 
 document.getElementById('weatherForm').addEventListener('submit', function(e) {
     e.preventDefault();
@@ -37,15 +41,9 @@ document.getElementById('weatherForm').addEventListener('submit', function(e) {
         });
 });
 
-// Function to make the fetch request to the openAI API
+// Make the activities & weather fetch request to the openAI API
 function gptRequest() {
-    fetch(`/chat?${queryParams = new URLSearchParams({
-        postcode: gptRequestData.postcode,
-        weather: gptRequestData.weather,
-        temperature: gptRequestData.temperature,
-        maxTemp: gptRequestData.maxTemp,
-        name: gptRequestData.name,
-        conversation: gptRequestData.reply,}).toString()}`)
+    fetch(`/activities?${queryParams = new URLSearchParams(gptRequestData).toString()}`)
         .then(response => {
             if (!response.ok) {
               throw new Error(`HTTP error! Status: ${response.status}`);
@@ -53,7 +51,9 @@ function gptRequest() {
             return response.json();
           })
           .then(data => {
-            gptRequestData.reply += data[0].message.content;
+            // add gpt reply to conversation array if user wants to ask further questions
+            gptConversation.push(data[0].message.content);
+            console.log('this is gptConversation', gptConversation);
             const gptReply = document.getElementById('gptReply');
             console.log('this is gptRequestData', gptRequestData);
             gptReply.innerText = `${data[0].message.content}`;
@@ -61,4 +61,33 @@ function gptRequest() {
       .catch(error => {
         console.error('Error:', error);
       });
+};
+
+// Takes user response and adds it to gptConversation array before calling gptQuestion()
+document.getElementById('userInput').addEventListener('submit', function(e) {
+  e.preventDefault();
+  let userQuestion = document.getElementById('userQuestion').value;
+  gptConversation.push(userQuestion);
+  gptAnswer.innerHTML += `<p>${userQuestion}</p>`;
+  document.getElementById('userQuestion').value = '';
+
+  gptQuestion();
+});
+
+// For continuing conversation between user and chatGPT
+function gptQuestion() {
+  const userInput = encodeURIComponent(JSON.stringify(gptConversation));
+  const url = `/chat?userInput=${userInput}`;
+  fetch(url)
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(data => {
+    gptConversation.push(data[0].message.content);
+    console.log('this is 2nd gptConversation', gptConversation);    
+    gptAnswer.innerHTML += `<p>${data[0].message.content}</p>`;
+  })
 };
