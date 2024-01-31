@@ -4,7 +4,7 @@ const gptRequestData = {};
 let queryParams;
 // Array to store conversation
 const gptConversation = [];
-// Variable to push user input & gpt replies to 
+// Variable to store user input & gpt replies to 
 const gptAnswer = document.getElementById('gptAnswer');
 
 document.getElementById('weatherForm').addEventListener('submit', function(e) {
@@ -33,7 +33,7 @@ document.getElementById('weatherForm').addEventListener('submit', function(e) {
                                     <p>Coords: ${weatherData.coord.lat}</p>
                                     <p>Postcode: ${postcode}</p>`;// Display weather data
             // Call function to make fetch request to chatGPT
-            gptRequest()
+            // gptRequest()
         })
         .catch(error => {
             console.error('Error:', error);
